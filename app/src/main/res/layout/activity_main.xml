@@ -65,7 +65,7 @@
                 android:id="@+id/textView_stdDay"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="기준 일시 : "
+                android:text="기준 일자 : "
                 android:textColor="@color/white"
                 android:textSize="20dp" />
 

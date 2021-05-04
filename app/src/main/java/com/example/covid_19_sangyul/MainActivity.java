@@ -1,6 +1,7 @@
 package com.example.covid_19_sangyul;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -14,6 +15,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
@@ -78,6 +80,7 @@ public class MainActivity
     private View mLayout;  // Snackbar 사용하기 위해서는 View가 필요합니다.
     // (참고로 Toast에서는 Context가 필요했습니다.)
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -173,14 +176,11 @@ public class MainActivity
         });
 
 
-        //city에 맞게 val에 있는 데이터 받아올 수 있게 index 찾기
-
-        int valLength = 20;
-        COVID_API cov = new COVID_API();
-        COVID_API[] val = new COVID_API[valLength];
+        //여기서부터 데이터 parsing 후 csv 파일에서  읽어옴
+        COVID_API covid = new COVID_API();
 //
         try {
-            val = cov.parse_COVID19();
+            covid.parse_COVID19(); //xml데이터 parsing 후 csv 파일로 저장
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         } catch (SAXException e) {
@@ -188,14 +188,8 @@ public class MainActivity
         } catch (IOException e) {
             e.printStackTrace();
         }
-//
-//        String[] strCity = new String[valLength];
-//        for (int i = 0; i < valLength; i++) {
-//            strCity[i] = val[i].getCity();
-//        }
-        //int idx = Arrays.binarySearch(strCity, city);  //배열에서 이진탐색으로 현재 도시가 어느 칸에 있는지 찾기
-//
-//
+
+
 //        //COVID_API에서 받아온 데이터 표시(확진자 수 등)
 //        final TextView textView_stdDayValue = (TextView)findViewById(R.id.textView_stdDayValue); //현재 주소
 //        final TextView textView_OverValue = (TextView)findViewById(R.id.textView_OverValue); //해외유입 수

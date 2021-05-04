@@ -1,5 +1,10 @@
 package com.example.covid_19_sangyul;
 
+import android.annotation.SuppressLint;
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -29,13 +34,13 @@ import java.io.FileWriter;
 
 
 public class COVID_API {
-    protected String stdDay; // 기준 일시
-    protected String city; // 도시
-    protected String deathCnt; // 사망자 수
-    protected String defCnt; // 확진자 수
-    protected String isolIngCnt; // 격리 중
-    protected String overFlowCnt; // 해외유입 수
-    protected String localOccCnt; // 지역발생 수
+    private String stdDay; // 기준 일시
+    private String city; // 도시
+    private String deathCnt; // 사망자 수
+    private String defCnt; // 확진자 수
+    private String isolIngCnt; // 격리 중
+    private String overFlowCnt; // 해외유입 수
+    private String localOccCnt; // 지역발생 수
 
     COVID_API() {
            this.setCity("0");
@@ -100,10 +105,43 @@ public class COVID_API {
                 " 기준 일자 : " + this.stdDay);
         }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public void csvWrite(String filepath, COVID_API[] val) {
+        //csv에 데이터 넣기(1줄씩)
+        File file = null;
+        BufferedWriter bw = null;
+        String NewLine = System.lineSeparator(); //줄바꿈 기능
 
+        try {
+            file = new File(filepath); //csv 파일 생성
+            bw = new BufferedWriter(new FileWriter(file));
 
+            bw.write("도시,기준일자,해외유입,지역발생,격리,확진,사망");
+            bw.write(NewLine);
 
-    public COVID_API[] parse_COVID19() throws ParserConfigurationException, SAXException, IOException {
+            for(int i = 0; i < val.length; i++) {
+                //도시,기준일자,해외유입,지역발생,격리,확진,사망
+                bw.write(val[i].city + "," +
+                        val[i].stdDay + "," +
+                        val[i].overFlowCnt + "," +
+                        val[i].localOccCnt + "," +
+                        val[i].isolIngCnt + "," +
+                        val[i].defCnt + "," +
+                        val[i].deathCnt);
+
+                bw.write(NewLine);
+            }
+
+            bw.flush();
+            bw.close();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public void parse_COVID19() throws ParserConfigurationException, SAXException, IOException {
         COVID_API[] val = new COVID_API[20]; //지역 별 데이터를 넣어줄 변수 생성
         String APIKey = "Y0zjhgf%2B9SgizMTPnOYM1mi3zSqZ7yxVmAscDxZmtxSpkTh7QfOIMMR5xIMZdByfu%2BOj5AXBaNNGzb2m3WXH%2Bg%3D%3D";
         Calendar cal = Calendar.getInstance();
@@ -115,10 +153,13 @@ public class COVID_API {
                 : Integer.toString(0) + Integer.toString(month))
                 + (Integer.toString(day).length() >= 2 ? Integer.toString(day)
                 : Integer.toString(0) + Integer.toString(day)); // 20210429
-
         for (int i = 0; i < 20; i++) { //변수 초기화
             val[i] = new COVID_API();
         }
+        //csv파일 경로
+        String filePath = "//data//data//com.example.covid_19_sangyul//files//parsingData.csv";
+        
+
 
         System.out.println("today : " + today);
         StringBuilder urlBuilder = new StringBuilder("http://openapi.data.go.kr/openapi/service/rest/Covid19/getCovid19SidoInfStateJson"); /*URL*/
@@ -244,6 +285,9 @@ public class COVID_API {
                                     System.out.println();
                                     System.out.println();
 
+
+
+
                                 }
                             }
                         }
@@ -251,6 +295,10 @@ public class COVID_API {
                 }
             }
         }
-        return val;
+
+        csvWrite(filePath, val);
     }
+
+
+
 }
