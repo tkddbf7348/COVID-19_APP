@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/activity_main"
+    android:background="@color/black">
+
+
+    <TextView
+        android:id="@+id/textView_Title"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:textSize="30dp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:text="COVID-19 현황" />
+
+    <TextView
+        android:id="@+id/textView_addr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:text="현재 주소" />
+
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        tools:context=".MapsActivity" />
+
+    <TableLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/textView_city"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="지역"
+                android:textColor="@color/white"
+                android:textSize="15dp" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="코로나 진행 현황"
+                android:textColor="@color/white"
+                android:textSize="20dp" />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/textView_stdDay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="기준 일시 : "
+                android:textColor="@color/white"
+                android:textSize="20dp" />
+
+            <TextView
+                android:id="@+id/textView_stdDayValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0000년 00월 00일"
+                android:textColor="@color/white"
+                android:textSize="20dp" />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/textView_Over"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="해외 유입 : "
+                android:textColor="@color/white"
+                android:textSize="20dp" />
+
+            <TextView
+                android:id="@+id/textView_OverValue"
+                android:layout_width="159dp"
+                android:layout_height="wrap_content"
+                android:text="000명"
+                android:textColor="@color/white"
+                android:textSize="20dp" />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/textView_Local"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="지역 발생 : "
+                android:textColor="#FF5722"
+                android:textSize="20dp" />
+
+            <TextView
+                android:id="@+id/textView_LocalValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="000명"
+                android:textColor="@color/white"
+                android:textSize="20dp" />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/textView_isol"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="격리 : "
+                android:textColor="@color/teal_700"
+                android:textSize="20dp" />
+
+            <TextView
+                android:id="@+id/textView_isolValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="000명"
+                android:textColor="@color/white"
+                android:textSize="20dp" />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/textView_def"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="확진 : "
+                android:textColor="#FF5722"
+                android:textSize="20dp" />
+
+            <TextView
+                android:id="@+id/textView_defValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="000명"
+                android:textColor="@color/white"
+                android:textSize="20dp" />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/textView_death"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="사망 : "
+                android:textColor="#E91E1E"
+                android:textSize="20dp" />
+
+            <TextView
+                android:id="@+id/textView_deathValue"
+                android:layout_width="165dp"
+                android:layout_height="wrap_content"
+                android:text="000명"
+                android:textColor="@color/white"
+                android:textSize="20dp" />
+        </TableRow>
+    </TableLayout>
+
+    <LinearLayout android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:layout_weight="1">
+    </LinearLayout>
+
+
+    <LinearLayout android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/button_Progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/button_ripple_effect"
+            android:text="진행 현황"
+            android:textColor="@color/white"
+            app:backgroundTint="#4CAF50"
+            />
+
+        <Button
+            android:id="@+id/button_Distancing"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/button_ripple_effect"
+            android:text="거리두기 단계 현황"
+            android:textColor="@color/white"
+            app:backgroundTint="#4CAF50" />
+    </LinearLayout>
+
+
+</LinearLayout>
