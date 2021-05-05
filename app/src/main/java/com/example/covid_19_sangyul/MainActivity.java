@@ -8,6 +8,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -80,6 +81,7 @@ public class MainActivity
     private View mLayout;  // Snackbar 사용하기 위해서는 View가 필요합니다.
     // (참고로 Toast에서는 Context가 필요했습니다.)
 
+    @SuppressLint("SetTextI18n")
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -177,10 +179,14 @@ public class MainActivity
 
 
         //여기서부터 데이터 parsing 후 csv 파일에서  읽어옴
-        COVID_API covid = new COVID_API();
+        COVID_API[] val = new COVID_API[20]; //데이터 넣을 객체
+        for (int i = 0; i < 20; i++) { //객체 초기화
+            val[i] = new COVID_API();
+        }
+        COVID_API covid_obj = new COVID_API(); //함수 호출할 객체
 //
         try {
-            covid.parse_COVID19(); //xml데이터 parsing 후 csv 파일로 저장
+            val = val[0].parse_COVID19(); //xml데이터 parsing 후 csv 파일로 저장
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         } catch (SAXException e) {
@@ -190,20 +196,20 @@ public class MainActivity
         }
 
 
-//        //COVID_API에서 받아온 데이터 표시(확진자 수 등)
-//        final TextView textView_stdDayValue = (TextView)findViewById(R.id.textView_stdDayValue); //현재 주소
-//        final TextView textView_OverValue = (TextView)findViewById(R.id.textView_OverValue); //해외유입 수
-//        final TextView textView_LocalValue = (TextView)findViewById(R.id.textView_LocalValue); //지역발생 수
-//        final TextView textView_isolValue = (TextView)findViewById(R.id.textView_isolValue); //격리자 수
-//        final TextView textView_defValue = (TextView)findViewById(R.id.textView_defValue); //확진자 수
-//        final TextView textView_deathValue = (TextView)findViewById(R.id.textView_deathValue); //사망자 수
-//
-//        textView_stdDayValue.setText(val[0].getstdDay()); //기준 일자 받아옴
-//        textView_OverValue.setText(val[0].getOverFlowCnt()); //해외유입 수 받아옴
-//        textView_LocalValue.setText(val[0].getLocalOccCnt()); //지역발생 수 받아옴
-//        textView_isolValue.setText(val[0].getIsolIngCnt()); //격리자 수 받아옴
-//        textView_defValue.setText(val[0].getDefCnt()); //확진자 수 받아옴
-//        textView_deathValue.setText(val[0].getDeathCnt()); //사망자 수 받아옴
+        //COVID_API에서 받아온 데이터 표시(확진자 수 등)
+        final TextView textView_stdDayValue = (TextView)findViewById(R.id.textView_stdDayValue); //현재 주소
+        final TextView textView_OverValue = (TextView)findViewById(R.id.textView_OverValue); //해외유입 수
+        final TextView textView_LocalValue = (TextView)findViewById(R.id.textView_LocalValue); //지역발생 수
+        final TextView textView_isolValue = (TextView)findViewById(R.id.textView_isolValue); //격리자 수
+        final TextView textView_defValue = (TextView)findViewById(R.id.textView_defValue); //확진자 수
+        final TextView textView_deathValue = (TextView)findViewById(R.id.textView_deathValue); //사망자 수
+
+        textView_stdDayValue.setText(val[0].getstdDay()); //기준 일자 받아옴
+        textView_OverValue.setText(val[0].getOverFlowCnt() + "명"); //해외유입 수 받아옴
+        textView_LocalValue.setText(val[0].getLocalOccCnt()+ "명"); //지역발생 수 받아옴
+        textView_isolValue.setText(val[0].getIsolIngCnt()+ "명"); //격리자 수 받아옴
+        textView_defValue.setText(val[0].getDefCnt()+ "명"); //확진자 수 받아옴
+        textView_deathValue.setText(val[0].getDeathCnt()+ "명"); //사망자 수 받아옴
     }
 
     public String getCurrentAddress( double latitude, double longitude) {

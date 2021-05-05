@@ -5,6 +5,8 @@ import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
+import com.opencsv.CSVWriter;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -30,7 +32,8 @@ import org.xml.sax.SAXException;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-
+import java.util.Iterator;
+import java.util.List;
 
 
 public class COVID_API {
@@ -105,43 +108,9 @@ public class COVID_API {
                 " 기준 일자 : " + this.stdDay);
         }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    public void csvWrite(String filepath, COVID_API[] val) {
-        //csv에 데이터 넣기(1줄씩)
-        File file = null;
-        BufferedWriter bw = null;
-        String NewLine = System.lineSeparator(); //줄바꿈 기능
 
-        try {
-            file = new File(filepath); //csv 파일 생성
-            bw = new BufferedWriter(new FileWriter(file));
 
-            bw.write("도시,기준일자,해외유입,지역발생,격리,확진,사망");
-            bw.write(NewLine);
-
-            for(int i = 0; i < val.length; i++) {
-                //도시,기준일자,해외유입,지역발생,격리,확진,사망
-                bw.write(val[i].city + "," +
-                        val[i].stdDay + "," +
-                        val[i].overFlowCnt + "," +
-                        val[i].localOccCnt + "," +
-                        val[i].isolIngCnt + "," +
-                        val[i].defCnt + "," +
-                        val[i].deathCnt);
-
-                bw.write(NewLine);
-            }
-
-            bw.flush();
-            bw.close();
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    public void parse_COVID19() throws ParserConfigurationException, SAXException, IOException {
+    public COVID_API[] parse_COVID19() throws ParserConfigurationException, SAXException, IOException {
         COVID_API[] val = new COVID_API[20]; //지역 별 데이터를 넣어줄 변수 생성
         String APIKey = "Y0zjhgf%2B9SgizMTPnOYM1mi3zSqZ7yxVmAscDxZmtxSpkTh7QfOIMMR5xIMZdByfu%2BOj5AXBaNNGzb2m3WXH%2Bg%3D%3D";
         Calendar cal = Calendar.getInstance();
@@ -161,7 +130,7 @@ public class COVID_API {
         
 
 
-        System.out.println("today : " + today);
+        //System.out.println("today : " + today);
         StringBuilder urlBuilder = new StringBuilder("http://openapi.data.go.kr/openapi/service/rest/Covid19/getCovid19SidoInfStateJson"); /*URL*/
         urlBuilder.append("?" + URLEncoder.encode("ServiceKey","UTF-8") + "=" + APIKey); /*Service Key*/
         urlBuilder.append("&" + URLEncoder.encode("pageNo","UTF-8") + "=" + URLEncoder.encode("1", "UTF-8")); /* page number */
@@ -174,7 +143,7 @@ public class COVID_API {
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
         conn.setRequestProperty("Content-type", "application/json");
-        System.out.println("Response code: " + conn.getResponseCode());
+        //System.out.println("Response code: " + conn.getResponseCode());
         BufferedReader rd;
         if(conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300) {
             rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -192,7 +161,7 @@ public class COVID_API {
 
 
         String xml = sb.toString();
-        System.out.println("xml : " + xml);
+        //System.out.println("xml : " + xml);
 
 
         //parsing 시작
@@ -209,13 +178,13 @@ public class COVID_API {
             if(node.getNodeType() == Node.ELEMENT_NODE){
                 Element ele = (Element)node;
                 String nodeName = ele.getNodeName();
-                System.out.println(nodeName);
+                //System.out.println(nodeName);
 
 
 
 
                 if(nodeName.equals("body")) { //in body
-                    System.out.println();
+                    //System.out.println();
                     NodeList children_body = ele.getChildNodes();
 
                     for(int j = 0; j < children_body.getLength(); j++) {
@@ -223,13 +192,13 @@ public class COVID_API {
                         if(node_body.getNodeType() == Node.ELEMENT_NODE){
                             Element ele_body = (Element)node_body;
                             String nodeName_body = ele_body.getNodeName();
-                            System.out.println(nodeName_body);
+                            //System.out.println(nodeName_body);
 
 
 
 
                             if(nodeName_body.equals("items")) { //in items
-                                System.out.println();
+                                //System.out.println();
                                 NodeList children_items = ele_body.getChildNodes();
 
                                 for (int k = 0; k < children_items.getLength(); k++) {
@@ -237,7 +206,7 @@ public class COVID_API {
                                     if(node_items.getNodeType() == Node.ELEMENT_NODE) {
                                         Element ele_items = (Element)node_items;
                                         String nodeName_items = ele_items.getNodeName();
-                                        System.out.println(nodeName_items);
+                                        //System.out.println(nodeName_items);
 
 
 
@@ -248,7 +217,7 @@ public class COVID_API {
                                             Node node_item = children_item.item(m);
                                             if(node_item.getNodeType() == Node.ELEMENT_NODE) {
                                                 Element ele_item = (Element)node_item;
-                                                System.out.println(ele_item.getNodeName() + " : " + ele_item.getTextContent()); // createDt : ~~~  gubun : ~~~......etc
+                                                //System.out.println(ele_item.getNodeName() + " : " + ele_item.getTextContent()); // createDt : ~~~  gubun : ~~~......etc
 
                                                 switch (ele_item.getNodeName()) { //넘겨줄 변수에 값 대입
                                                     case ("stdDay") :
@@ -280,14 +249,10 @@ public class COVID_API {
                                             }
                                         }
                                     }
-                                    val[k].printvalue();
-                                    System.out.println();
-                                    System.out.println();
-                                    System.out.println();
-
-
-
-
+//                                    val[k].printvalue();
+//                                    System.out.println();
+//                                    System.out.println();
+//                                    System.out.println();
                                 }
                             }
                         }
@@ -295,10 +260,6 @@ public class COVID_API {
                 }
             }
         }
-
-        csvWrite(filePath, val);
+        return val;
     }
-
-
-
 }
