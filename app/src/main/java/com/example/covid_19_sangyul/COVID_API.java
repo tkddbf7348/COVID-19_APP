@@ -3,12 +3,18 @@ package com.example.covid_19_sangyul;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.amitshekhar.DebugDB;
 import com.opencsv.CSVWriter;
 
 import java.io.BufferedReader;
@@ -41,84 +47,88 @@ import java.util.List;
 
 
 public class COVID_API extends Activity {
-    private String stdDay; // 기준 일시
-    private String city; // 도시
-    private String deathCnt; // 사망자 수
-    private String defCnt; // 확진자 수
-    private String isolIngCnt; // 격리 중
-    private String overFlowCnt; // 해외유입 수
-    private String localOccCnt; // 지역발생 수
 
-    COVID_API() {
-           this.setCity("0");
-           this.setStdDay("0");
-           this.setDeathCnt("0");
-           this.setDefCnt("0");
-           this.setIsolIngCnt("0");
-           this.setOverFlowCnt("0");
-           this.setLocalOccCnt("0");
-       }
+    class ITEM {
+        private String stdDay; // 기준 일시
+        private String city; // 도시
+        private String deathCnt; // 사망자 수
+        private String defCnt; // 확진자 수
+        private String isolIngCnt; // 격리 중
+        private String overFlowCnt; // 해외유입 수
+        private String localOccCnt; // 지역발생 수
+
+        ITEM() {
+            this.setCity("0");
+            this.setStdDay("0");
+            this.setDeathCnt("0");
+            this.setDefCnt("0");
+            this.setIsolIngCnt("0");
+            this.setOverFlowCnt("0");
+            this.setLocalOccCnt("0");
+        }
+
+        public String getstdDay() {
+            return this.stdDay;
+        }
+        public void setStdDay(String stdDay) {
+            this.stdDay = stdDay;
+        }
+        public String getCity() {
+            return this.city;
+        }
+        public void setCity(String city) {
+            this.city = city;
+        }
+        public String getDeathCnt() {
+            return this.deathCnt;
+        }
+        public void setDeathCnt(String deathCnt) {
+            this.deathCnt = deathCnt;
+        }
+        public String getDefCnt() {
+            return this.defCnt;
+        }
+        public void setDefCnt(String defCnt) {
+            this.defCnt = defCnt;
+        }
+        public String getIsolIngCnt() {
+            return this.isolIngCnt;
+        }
+        public void setIsolIngCnt(String isolIngCnt) {
+            this.isolIngCnt = isolIngCnt;
+        }
+        public String getOverFlowCnt() {
+            return this.overFlowCnt;
+        }
+        public void setOverFlowCnt(String overFlowCnt) {
+            this.overFlowCnt = overFlowCnt;
+        }
+        public String getLocalOccCnt() {
+            return this.localOccCnt;
+        }
+        public void setLocalOccCnt(String localOccCnt) {
+            this.localOccCnt = localOccCnt;
+        }
+
+        public void printvalue() {
+            System.out.print("도시 : " + this.city +
+                    " 사망자 수 : " + this.deathCnt + " " +
+                    " 확진자 수 : " + this.defCnt + " " +
+                    " 격리자 수 : " + this.isolIngCnt + " " +
+                    " 지역 발생 수 : " + this.localOccCnt + " " +
+                    " 해외 유입 수 : " + this.overFlowCnt + " " +
+                    " 기준 일자 : " + this.stdDay);
+        }
+    }
+
     private DBOpenHelper db;
 
-       public String getstdDay() {
-           return this.stdDay;
-       }
-       public void setStdDay(String stdDay) {
-           this.stdDay = stdDay;
-       }
-       public String getCity() {
-           return this.city;
-       }
-       public void setCity(String city) {
-           this.city = city;
-       }
-       public String getDeathCnt() {
-           return this.deathCnt;
-       }
-       public void setDeathCnt(String deathCnt) {
-           this.deathCnt = deathCnt;
-       }
-       public String getDefCnt() {
-           return this.defCnt;
-       }
-       public void setDefCnt(String defCnt) {
-           this.defCnt = defCnt;
-       }
-       public String getIsolIngCnt() {
-           return this.isolIngCnt;
-       }
-       public void setIsolIngCnt(String isolIngCnt) {
-           this.isolIngCnt = isolIngCnt;
-       }
-       public String getOverFlowCnt() {
-           return this.overFlowCnt;
-       }
-       public void setOverFlowCnt(String overFlowCnt) {
-           this.overFlowCnt = overFlowCnt;
-       }
-       public String getLocalOccCnt() {
-           return this.localOccCnt;
-       }
-       public void setLocalOccCnt(String localOccCnt) {
-           this.localOccCnt = localOccCnt;
-       }
 
-       public void printvalue() {
-        System.out.print("도시 : " + this.city +
-                " 사망자 수 : " + this.deathCnt + " " +
-                " 확진자 수 : " + this.defCnt + " " +
-                " 격리자 수 : " + this.isolIngCnt + " " +
-                " 지역 발생 수 : " + this.localOccCnt + " " +
-                " 해외 유입 수 : " + this.overFlowCnt + " " +
-                " 기준 일자 : " + this.stdDay);
-        }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.second);
-
-        Intent inIntent = getIntent();
 
         //db열고 테이블 생성
         db = new DBOpenHelper(this);
@@ -136,16 +146,22 @@ public class COVID_API extends Activity {
             e.printStackTrace();
         }
 
+        Button button_parsing_return = (Button) findViewById(R.id.button_parsing_return);
 
+        button_parsing_return.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //메인으로 넘어감
+                Toast.makeText(COVID_API.this, "데이터 저장 완료", Toast.LENGTH_SHORT).show();
+                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                 startActivity(intent);
+            }
+        });
 
-        //메인으로 넘어감
-        Intent outIntent = new Intent(getApplicationContext(), MainActivity.class);
-        outIntent.putExtra("res2", "ok");
-        setResult(RESULT_OK, outIntent);
     }
 
     public void parse_COVID19() throws ParserConfigurationException, SAXException, IOException {
-        COVID_API[] val = new COVID_API[20]; //지역 별 데이터를 넣어줄 변수 생성
+        ITEM[] val = new ITEM[20]; //지역 별 데이터를 넣어줄 변수 생성
         String APIKey = "Y0zjhgf%2B9SgizMTPnOYM1mi3zSqZ7yxVmAscDxZmtxSpkTh7QfOIMMR5xIMZdByfu%2BOj5AXBaNNGzb2m3WXH%2Bg%3D%3D";
         Calendar cal = Calendar.getInstance();
         int year = cal.get(Calendar.YEAR);
@@ -157,7 +173,7 @@ public class COVID_API extends Activity {
                 + (Integer.toString(day).length() >= 2 ? Integer.toString(day)
                 : Integer.toString(0) + Integer.toString(day)); // 20210429
         for (int i = 0; i < 20; i++) { //변수 초기화
-            val[i] = new COVID_API();
+            val[i] = new ITEM();
         }
 
 
@@ -278,7 +294,8 @@ public class COVID_API extends Activity {
                                     //여기서부터 DB에 데이터 삽입
                                     db.open();
                                     db.insertColumn(val[k].city, val[k].stdDay, val[k].overFlowCnt, val[k].localOccCnt, val[k].isolIngCnt, val[k].defCnt, val[k].deathCnt);
-
+                                    DebugDB.getAddressLog();
+                                    showDatabase("localOccCnt");
 //                                    val[k].printvalue();
 //                                    System.out.println();
 //                                    System.out.println();
@@ -291,4 +308,41 @@ public class COVID_API extends Activity {
             }
         }
     }
+
+    public void showDatabase(String sort){
+        Cursor iCursor = db.sortColumn(sort);
+        Log.d("showDatabase", "DB Size: " + iCursor.getCount());
+        String res = "";
+        while(iCursor.moveToNext()){
+            String tempIndex = iCursor.getString(iCursor.getColumnIndex("_id"));
+            String tempCity = iCursor.getString(iCursor.getColumnIndex("City"));
+            tempCity = setTextLength(tempCity,10);
+            String tempstdDay = iCursor.getString(iCursor.getColumnIndex("stdDay"));
+            tempstdDay = setTextLength(tempstdDay,10);
+            String tempoverFlowCnt = iCursor.getString(iCursor.getColumnIndex("overFlowCnt"));
+            tempoverFlowCnt = setTextLength(tempoverFlowCnt,10);
+            String templocalOccCnt = iCursor.getString(iCursor.getColumnIndex("localOccCnt"));
+            templocalOccCnt = setTextLength(templocalOccCnt,10);
+            String tempisolIngCnt = iCursor.getString(iCursor.getColumnIndex("isolIngCnt"));
+            tempisolIngCnt = setTextLength(tempisolIngCnt,10);
+            String tempdefCnt = iCursor.getString(iCursor.getColumnIndex("defCnt"));
+            tempdefCnt = setTextLength(tempdefCnt,10);
+            String tempdeathCnt = iCursor.getString(iCursor.getColumnIndex("deathCnt"));
+            tempdeathCnt = setTextLength(tempdeathCnt,10);
+
+            res = tempCity + tempstdDay + tempoverFlowCnt + templocalOccCnt + tempisolIngCnt + tempdefCnt + tempdeathCnt;
+        }
+        Log.d("showDatabase", "데이터베이스 : "  + res);
+    }
+
+    public String setTextLength(String text, int length){
+        if(text.length()<length){
+            int gap = length - text.length();
+            for (int i=0; i<gap; i++){
+                text = text + " ";
+            }
+        }
+        return text;
+    }
+
 }

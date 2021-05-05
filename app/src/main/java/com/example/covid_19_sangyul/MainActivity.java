@@ -164,6 +164,7 @@ public class MainActivity
         //여기서부터 버튼 기능
         Button button_Progress = (Button) findViewById(R.id.button_Progress);
         Button button_Distancing = (Button) findViewById(R.id.button_Distancing);
+        Button button_parsing = (Button) findViewById(R.id.button_parsing);
 
         button_Progress.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -179,12 +180,18 @@ public class MainActivity
             }
         });
 
+        button_parsing.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //xml 파싱 실행
+                Toast.makeText(MainActivity.this, "데이터 가져오는 중..", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getApplicationContext(), COVID_API.class);
+                startActivity(intent);
+            }
+        });
 
 
-        //xml 파싱 실행
-        Intent intent = new Intent(getApplicationContext(), COVID_API.class);
-        intent.putExtra("res1", "ok");
-        startActivityForResult(intent,0);
+
 
         //DB연동해서 데이터 받아오기
         DBOpenHelper db = new DBOpenHelper(this);

@@ -32,6 +32,15 @@
         android:layout_height="200dp"
         tools:context=".MapsActivity" />
 
+    <Button
+        android:id="@+id/button_parsing"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_ripple_effect"
+        android:text="데이터 받아오기"
+        android:textColor="@color/white"
+        app:backgroundTint="#4CAF50" />
+
     <TableLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

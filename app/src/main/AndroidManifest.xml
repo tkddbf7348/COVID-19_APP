@@ -20,7 +20,8 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBAQ00G2yOPpSvP_HqYKU3vl0mklcbYq_Y"/>
 
-        <activity android:name=".COVID_API"></activity>
+        //
+        <activity android:name=".COVID_API" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -64,7 +64,7 @@ public class DBOpenHelper {
         return mDB.delete(DB.CreateDB.TABLENAME, "_id="+id, null) > 0;
     }
 
-    private class DatabaseHelper extends SQLiteOpenHelper {
+    public class DatabaseHelper extends SQLiteOpenHelper {
 
         //생성자
         public DatabaseHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -102,5 +102,10 @@ public class DBOpenHelper {
 
     public void close(){
         mDB.close();
+    }
+
+    public Cursor sortColumn(String sort){
+        Cursor c = mDB.rawQuery( "SELECT * FROM COVID19 ORDER BY " + sort + ";", null);
+        return c;
     }
 }
