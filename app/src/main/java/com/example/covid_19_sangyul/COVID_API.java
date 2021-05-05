@@ -1,6 +1,7 @@
 package com.example.covid_19_sangyul;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Build;
 
 import androidx.annotation.RequiresApi;
@@ -110,7 +111,7 @@ public class COVID_API {
 
 
 
-    public COVID_API[] parse_COVID19() throws ParserConfigurationException, SAXException, IOException {
+    public void parse_COVID19() throws ParserConfigurationException, SAXException, IOException {
         COVID_API[] val = new COVID_API[20]; //지역 별 데이터를 넣어줄 변수 생성
         String APIKey = "Y0zjhgf%2B9SgizMTPnOYM1mi3zSqZ7yxVmAscDxZmtxSpkTh7QfOIMMR5xIMZdByfu%2BOj5AXBaNNGzb2m3WXH%2Bg%3D%3D";
         Calendar cal = Calendar.getInstance();
@@ -125,9 +126,9 @@ public class COVID_API {
         for (int i = 0; i < 20; i++) { //변수 초기화
             val[i] = new COVID_API();
         }
-        //csv파일 경로
-        String filePath = "//data//data//com.example.covid_19_sangyul//files//parsingData.csv";
-        
+
+
+
 
 
         //System.out.println("today : " + today);
@@ -249,6 +250,7 @@ public class COVID_API {
                                             }
                                         }
                                     }
+
 //                                    val[k].printvalue();
 //                                    System.out.println();
 //                                    System.out.println();
@@ -260,6 +262,5 @@ public class COVID_API {
                 }
             }
         }
-        return val;
     }
 }

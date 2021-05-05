@@ -75,7 +75,7 @@
                 android:layout_height="wrap_content"
                 android:text="0000년 00월 00일"
                 android:textColor="@color/white"
-                android:textSize="20dp" />
+                android:textSize="10dp" />
         </TableRow>
 
         <TableRow>
@@ -178,6 +178,14 @@
         android:layout_width="match_parent"
         android:orientation="horizontal"
         android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/textView_fileLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@color/white"
+            android:text="TextView" />
     </LinearLayout>
 
 
