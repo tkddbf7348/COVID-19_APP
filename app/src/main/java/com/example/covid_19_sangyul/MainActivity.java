@@ -12,6 +12,7 @@ import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -178,36 +179,43 @@ public class MainActivity
         });
 
         //xml 파싱 실행
-        COVID_API cov_obj = new COVID_API();
-        try {
-            cov_obj.parse_COVID19();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+
+        //DB연동해서 데이터 받아오기
+        DBOpenHelper db = new DBOpenHelper(this);
+        db.open();
+
+        //city와 같은 행 찾아오기
+        String[] res = new String[7];
+        Cursor iCursor = db.selectColumns();
+        while(iCursor.moveToNext()){
+            String tempCity = iCursor.getString(iCursor.getColumnIndex("City"));
+            String tempstdDay = iCursor.getString(iCursor.getColumnIndex("stdDay"));
+            String tempoverFlowCnt = iCursor.getString(iCursor.getColumnIndex("overFlowCnt"));
+            String templocalOccCnt = iCursor.getString(iCursor.getColumnIndex("localOccCnt"));
+            String tempisolIngCnt = iCursor.getString(iCursor.getColumnIndex("isolIngCnt"));
+            String tempdefCnt = iCursor.getString(iCursor.getColumnIndex("defCnt"));
+            String tempdeathCnt = iCursor.getString(iCursor.getColumnIndex("deathCnt"));
+            if(tempCity.equals(city)){
+                res = new String[]{tempCity, tempstdDay, tempoverFlowCnt, templocalOccCnt, tempisolIngCnt, tempdefCnt, tempdeathCnt};
+            }
         }
 
 
-
-        //파일 주소 확인
-        final TextView textView_fileLocation = (TextView)findViewById(R.id.textView_fileLocation); //현재 주소
-        textView_fileLocation.setText(getFilesDir().toString());
-
         //COVID_API에서 받아온 데이터 표시(확진자 수 등)
-//        final TextView textView_stdDayValue = (TextView)findViewById(R.id.textView_stdDayValue); //현재 주소
-//        final TextView textView_OverValue = (TextView)findViewById(R.id.textView_OverValue); //해외유입 수
-//        final TextView textView_LocalValue = (TextView)findViewById(R.id.textView_LocalValue); //지역발생 수
-//        final TextView textView_isolValue = (TextView)findViewById(R.id.textView_isolValue); //격리자 수
-//        final TextView textView_defValue = (TextView)findViewById(R.id.textView_defValue); //확진자 수
-//        final TextView textView_deathValue = (TextView)findViewById(R.id.textView_deathValue); //사망자 수
-//        textView_stdDayValue.setText(data[1]); //기준 일자 받아옴
-//        textView_OverValue.setText(data[2] + "명"); //해외유입 수 받아옴
-//        textView_LocalValue.setText(data[3] + "명"); //지역발생 수 받아옴
-//        textView_isolValue.setText(data[4] + "명"); //격리자 수 받아옴
-//        textView_defValue.setText(data[5] + "명"); //확진자 수 받아옴
-//        textView_deathValue.setText(data[6] + "명"); //사망자 수 받아옴
+        final TextView textView_stdDayValue = (TextView)findViewById(R.id.textView_stdDayValue); //현재 주소
+        final TextView textView_OverValue = (TextView)findViewById(R.id.textView_OverValue); //해외유입 수
+        final TextView textView_LocalValue = (TextView)findViewById(R.id.textView_LocalValue); //지역발생 수
+        final TextView textView_isolValue = (TextView)findViewById(R.id.textView_isolValue); //격리자 수
+        final TextView textView_defValue = (TextView)findViewById(R.id.textView_defValue); //확진자 수
+        final TextView textView_deathValue = (TextView)findViewById(R.id.textView_deathValue); //사망자 수
+        textView_stdDayValue.setText(res[1]); //기준 일자 받아옴
+        textView_OverValue.setText(res[2] + "명"); //해외유입 수 받아옴
+        textView_LocalValue.setText(res[3] + "명"); //지역발생 수 받아옴
+        textView_isolValue.setText(res[4] + "명"); //격리자 수 받아옴
+        textView_defValue.setText(res[5] + "명"); //확진자 수 받아옴
+        textView_deathValue.setText(res[6] + "명"); //사망자 수 받아옴
+
+        db.close();
     }
 
     public String getCurrentAddress( double latitude, double longitude) {

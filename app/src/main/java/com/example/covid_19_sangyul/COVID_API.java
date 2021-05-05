@@ -1,8 +1,10 @@
 package com.example.covid_19_sangyul;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Bundle;
 
 import androidx.annotation.RequiresApi;
 
@@ -37,7 +39,7 @@ import java.util.Iterator;
 import java.util.List;
 
 
-public class COVID_API {
+public class COVID_API extends Activity {
     private String stdDay; // 기준 일시
     private String city; // 도시
     private String deathCnt; // 사망자 수
@@ -55,6 +57,7 @@ public class COVID_API {
            this.setOverFlowCnt("0");
            this.setLocalOccCnt("0");
        }
+    DBOpenHelper db;
 
        public String getstdDay() {
            return this.stdDay;
@@ -109,7 +112,25 @@ public class COVID_API {
                 " 기준 일자 : " + this.stdDay);
         }
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
+        //db열고 테이블 생성
+        db = new DBOpenHelper(this);
+        db.open();
+        db.create();
+
+        try {
+            parse_COVID19();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void parse_COVID19() throws ParserConfigurationException, SAXException, IOException {
         COVID_API[] val = new COVID_API[20]; //지역 별 데이터를 넣어줄 변수 생성
@@ -126,9 +147,6 @@ public class COVID_API {
         for (int i = 0; i < 20; i++) { //변수 초기화
             val[i] = new COVID_API();
         }
-
-
-
 
 
         //System.out.println("today : " + today);
@@ -176,73 +194,67 @@ public class COVID_API {
 
         for(int i = 0; i < children.getLength(); i++) { // in response
             Node node = children.item(i);
-            if(node.getNodeType() == Node.ELEMENT_NODE){
-                Element ele = (Element)node;
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                Element ele = (Element) node;
                 String nodeName = ele.getNodeName();
                 //System.out.println(nodeName);
 
 
-
-
-                if(nodeName.equals("body")) { //in body
+                if (nodeName.equals("body")) { //in body
                     //System.out.println();
                     NodeList children_body = ele.getChildNodes();
 
-                    for(int j = 0; j < children_body.getLength(); j++) {
+                    for (int j = 0; j < children_body.getLength(); j++) {
                         Node node_body = children_body.item(j);
-                        if(node_body.getNodeType() == Node.ELEMENT_NODE){
-                            Element ele_body = (Element)node_body;
+                        if (node_body.getNodeType() == Node.ELEMENT_NODE) {
+                            Element ele_body = (Element) node_body;
                             String nodeName_body = ele_body.getNodeName();
                             //System.out.println(nodeName_body);
 
 
-
-
-                            if(nodeName_body.equals("items")) { //in items
+                            if (nodeName_body.equals("items")) { //in items
                                 //System.out.println();
                                 NodeList children_items = ele_body.getChildNodes();
 
                                 for (int k = 0; k < children_items.getLength(); k++) {
                                     Node node_items = children_items.item(k);
-                                    if(node_items.getNodeType() == Node.ELEMENT_NODE) {
-                                        Element ele_items = (Element)node_items;
+                                    if (node_items.getNodeType() == Node.ELEMENT_NODE) {
+                                        Element ele_items = (Element) node_items;
                                         String nodeName_items = ele_items.getNodeName();
                                         //System.out.println(nodeName_items);
 
 
-
-
                                         NodeList children_item = ele_items.getChildNodes(); //in item
 
-                                        for(int m = 0; m < children_item.getLength(); m++) {
+                                        for (int m = 0; m < children_item.getLength(); m++) {
                                             Node node_item = children_item.item(m);
-                                            if(node_item.getNodeType() == Node.ELEMENT_NODE) {
-                                                Element ele_item = (Element)node_item;
+                                            if (node_item.getNodeType() == Node.ELEMENT_NODE) {
+                                                Element ele_item = (Element) node_item;
                                                 //System.out.println(ele_item.getNodeName() + " : " + ele_item.getTextContent()); // createDt : ~~~  gubun : ~~~......etc
 
                                                 switch (ele_item.getNodeName()) { //넘겨줄 변수에 값 대입
-                                                    case ("stdDay") :
+                                                    case ("stdDay"):
                                                         val[k].setStdDay(ele_item.getTextContent());
                                                         break;
-                                                    case ("gubun") :
+                                                    case ("gubun"):
                                                         val[k].setCity(ele_item.getTextContent());
                                                         break;
-                                                    case ("deathCnt") :
+                                                    case ("deathCnt"):
                                                         val[k].setDeathCnt(ele_item.getTextContent());
                                                         break;
-                                                    case ("defCnt") :
+                                                    case ("defCnt"):
                                                         val[k].setDefCnt(ele_item.getTextContent());
                                                         break;
-                                                    case ("isolIngCnt") :
+                                                    case ("isolIngCnt"):
                                                         val[k].setIsolIngCnt(ele_item.getTextContent());
                                                         break;
-                                                    case ("overFlowCnt") :
+                                                    case ("overFlowCnt"):
                                                         val[k].setOverFlowCnt(ele_item.getTextContent());
                                                         break;
-                                                    case ("localOccCnt") :
+                                                    case ("localOccCnt"):
                                                         val[k].setLocalOccCnt(ele_item.getTextContent());
                                                         break;
-                                                    default :
+                                                    default:
                                                         break;
                                                 }
 
@@ -250,6 +262,10 @@ public class COVID_API {
                                             }
                                         }
                                     }
+
+                                    //여기서부터 DB에 데이터 삽입
+                                    db.open();
+                                    db.insertColumn(val[k].city, val[k].stdDay, val[k].overFlowCnt, val[k].localOccCnt, val[k].isolIngCnt, val[k].defCnt, val[k].deathCnt);
 
 //                                    val[k].printvalue();
 //                                    System.out.println();

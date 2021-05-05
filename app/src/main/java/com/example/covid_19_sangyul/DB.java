@@ -12,16 +12,17 @@ public final class DB {
         public static final String isolIngCnt = "isolIngCnt";
         public static final String defCnt = "defCnt";
         public static final String deathCnt = "deathCnt";
-        public static final String TABLENAME = "COVID-19";
+        public static final String TABLENAME = "COVID19";
 
-        public static final String _CREATE0 = "create table if not exists "+TABLENAME+"("
-                +_ID+" integer primary key autoincrement, "
-                +City+" text not null , "
-                +stdDay+" text not null , "
-                +overFlowCnt+" integer not null , "
-                +localOccCnt+" integer not null , "
-                +isolIngCnt+" integer not null , "
-                +defCnt+" integer not null , "
-                +deathCnt+" text not null );";
+        public static final String CREATE_TABLE = "create table if not exists "
+                + TABLENAME + "("
+                + _ID + " integer primary key autoincrement, "
+                + City + " text not null , "
+                + stdDay +" text not null , "
+                + overFlowCnt + " text not null , "
+                + localOccCnt + " text not null , "
+                + isolIngCnt + " text not null , "
+                + defCnt + " text not null , "
+                + deathCnt + " text not null );"  ;
     }
 }

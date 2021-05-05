@@ -37,8 +37,8 @@ public class DBOpenHelper {
     }
     
     //값 select 구문
-    public Cursor selectColumns(String[] columns, String selection, String[] selectionArgs, String groupBy, String having, String orderBy){
-        return mDB.query(DB.CreateDB.TABLENAME, columns, selection, selectionArgs, groupBy, having, orderBy);
+    public Cursor selectColumns(){
+        return mDB.query(DB.CreateDB.TABLENAME, null,null,null,null,null,null);
     }
     
     //값 update 구문
@@ -74,7 +74,7 @@ public class DBOpenHelper {
         //테이블 생성
         @Override
         public void onCreate(SQLiteDatabase db){
-            db.execSQL(DB.CreateDB._CREATE0); //COVID-19 테이블 생성
+            db.execSQL(DB.CreateDB.CREATE_TABLE); //COVID-19 테이블 생성
         }
 
         //버전업그레이드 시 이전버전을 지우고 새 버전 생성
@@ -88,6 +88,7 @@ public class DBOpenHelper {
     public DBOpenHelper(Context context){
         this.mCtx = context;
     }
+
 
     public DBOpenHelper open() throws SQLException {
         mDBHelper = new DatabaseHelper(mCtx, DATABASE_NAME, null, DATABASE_VERSION);
