@@ -88,6 +88,7 @@ public class MainActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -178,14 +179,20 @@ public class MainActivity
             }
         });
 
+
+
         //xml 파싱 실행
+        Intent intent = new Intent(getApplicationContext(), COVID_API.class);
+        intent.putExtra("res1", "ok");
+        startActivityForResult(intent,0);
 
         //DB연동해서 데이터 받아오기
         DBOpenHelper db = new DBOpenHelper(this);
         db.open();
 
         //city와 같은 행 찾아오기
-        String[] res = new String[7];
+        String[] res;
+        res = new String[]{"0", "0", "0", "0", "0", "0", "0"};
         Cursor iCursor = db.selectColumns();
         while(iCursor.moveToNext()){
             String tempCity = iCursor.getString(iCursor.getColumnIndex("City"));
@@ -217,6 +224,8 @@ public class MainActivity
 
         db.close();
     }
+
+
 
     public String getCurrentAddress( double latitude, double longitude) {
 
@@ -646,6 +655,12 @@ public class MainActivity
                     }
                 }
 
+
+                break;
+
+
+            case RESULT_OK :
+                Log.d(TAG, "onActivityResult : parsing done.");
                 break;
         }
     }

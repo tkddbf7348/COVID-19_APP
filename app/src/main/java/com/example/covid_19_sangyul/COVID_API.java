@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.opencsv.CSVWriter;
 
@@ -57,7 +58,7 @@ public class COVID_API extends Activity {
            this.setOverFlowCnt("0");
            this.setLocalOccCnt("0");
        }
-    DBOpenHelper db;
+    private DBOpenHelper db;
 
        public String getstdDay() {
            return this.stdDay;
@@ -115,6 +116,9 @@ public class COVID_API extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.second);
+
+        Intent inIntent = getIntent();
 
         //db열고 테이블 생성
         db = new DBOpenHelper(this);
@@ -122,6 +126,7 @@ public class COVID_API extends Activity {
         db.create();
 
         try {
+            //xml파싱 후 데이터 저장
             parse_COVID19();
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
@@ -130,6 +135,13 @@ public class COVID_API extends Activity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+
+
+        //메인으로 넘어감
+        Intent outIntent = new Intent(getApplicationContext(), MainActivity.class);
+        outIntent.putExtra("res2", "ok");
+        setResult(RESULT_OK, outIntent);
     }
 
     public void parse_COVID19() throws ParserConfigurationException, SAXException, IOException {
