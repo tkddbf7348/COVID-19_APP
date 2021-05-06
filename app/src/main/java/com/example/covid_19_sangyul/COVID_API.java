@@ -316,7 +316,6 @@ public class COVID_API extends Activity {
 
                                     //여기서부터 DB에 데이터 삽입
                                     db.insertColumn(val[k].city, val[k].stdDay, val[k].overFlowCnt, val[k].localOccCnt, val[k].isolIngCnt, val[k].defCnt, val[k].deathCnt);
-                                    showDatabase("localOccCnt", db);
 //                                    val[k].printvalue();
 //                                    System.out.println();
 //                                    System.out.println();
@@ -328,6 +327,8 @@ public class COVID_API extends Activity {
                 }
             }
         }
+
+        showDatabase("_id", db);
     }
 
     public void showDatabase(String sort, DBOpenHelper db){
