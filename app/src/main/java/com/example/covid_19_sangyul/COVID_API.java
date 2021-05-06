@@ -6,9 +6,12 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
@@ -121,8 +124,6 @@ public class COVID_API extends Activity {
         }
     }
 
-    private DBOpenHelper db;
-
 
 
     @Override
@@ -131,13 +132,13 @@ public class COVID_API extends Activity {
         setContentView(R.layout.second);
 
         //db열고 테이블 생성
-        db = new DBOpenHelper(this);
+        DBOpenHelper db = new DBOpenHelper(this);
         db.open();
         db.create();
 
         try {
             //xml파싱 후 데이터 저장
-            parse_COVID19();
+            parsing_COVID19(db);
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         } catch (SAXException e) {
@@ -160,8 +161,7 @@ public class COVID_API extends Activity {
 
     }
 
-    public void parse_COVID19() throws ParserConfigurationException, SAXException, IOException {
-        ITEM[] val = new ITEM[20]; //지역 별 데이터를 넣어줄 변수 생성
+    public void parsing_COVID19(DBOpenHelper db) throws ParserConfigurationException, SAXException, IOException {
         String APIKey = "Y0zjhgf%2B9SgizMTPnOYM1mi3zSqZ7yxVmAscDxZmtxSpkTh7QfOIMMR5xIMZdByfu%2BOj5AXBaNNGzb2m3WXH%2Bg%3D%3D";
         Calendar cal = Calendar.getInstance();
         int year = cal.get(Calendar.YEAR);
@@ -172,46 +172,71 @@ public class COVID_API extends Activity {
                 : Integer.toString(0) + Integer.toString(month))
                 + (Integer.toString(day).length() >= 2 ? Integer.toString(day)
                 : Integer.toString(0) + Integer.toString(day)); // 20210429
+
+
+        //System.out.println("today : " + today);
+        String urlBuilder = "http://openapi.data.go.kr/openapi/service/rest/Covid19/getCovid19SidoInfStateJson" +
+                "?" + URLEncoder.encode("ServiceKey", "UTF-8") + "=" + APIKey + /*Service Key*/
+                "&" + URLEncoder.encode("pageNo", "UTF-8") + "=" + URLEncoder.encode("1", "UTF-8") + /* page number */
+                "&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + URLEncoder.encode("10", "UTF-8") + /**/
+                "&" + URLEncoder.encode("startCreateDt", "UTF-8") + "=" + URLEncoder.encode(today, "UTF-8") + /* start date */
+                "&" + URLEncoder.encode("endCreateDt", "UTF-8") + "=" + URLEncoder.encode(today, "UTF-8");/*URL*//*end date */
+        URL url = new URL(urlBuilder);// url 생성
+
+        new Thread() {
+            public void run() {
+                String xml = "";
+                xml = xmlRequest(url); //url 쏴서 값 받아옴
+
+                try {
+                    parsingAndInsert(xml, db); //받아온 값 파싱 후 db에 저장
+                } catch (ParserConfigurationException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (SAXException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+
+    public String xmlRequest(URL url) {
+
+        String xml = "";
+
+        try {
+            //url 연결
+            HttpURLConnection conn = null;
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Content-type", "application/json");
+            //System.out.println("Response code: " + conn.getResponseCode());
+            BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = rd.readLine()) != null) {
+                sb.append(line);
+            }
+            rd.close();
+            conn.disconnect();
+            xml = sb.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //System.out.println("xml : " + xml);
+
+        return xml;
+    }
+
+
+    public void parsingAndInsert(String xml, DBOpenHelper db) throws ParserConfigurationException, IOException, SAXException {
+
+        ITEM[] val = new ITEM[20]; //지역 별 데이터를 넣어줄 변수 생성
         for (int i = 0; i < 20; i++) { //변수 초기화
             val[i] = new ITEM();
         }
 
-
-        //System.out.println("today : " + today);
-        StringBuilder urlBuilder = new StringBuilder("http://openapi.data.go.kr/openapi/service/rest/Covid19/getCovid19SidoInfStateJson"); /*URL*/
-        urlBuilder.append("?" + URLEncoder.encode("ServiceKey","UTF-8") + "=" + APIKey); /*Service Key*/
-        urlBuilder.append("&" + URLEncoder.encode("pageNo","UTF-8") + "=" + URLEncoder.encode("1", "UTF-8")); /* page number */
-        urlBuilder.append("&" + URLEncoder.encode("numOfRows","UTF-8") + "=" + URLEncoder.encode("10", "UTF-8")); /**/
-        urlBuilder.append("&" + URLEncoder.encode("startCreateDt","UTF-8") + "=" + URLEncoder.encode(today, "UTF-8")); /* start date */
-        urlBuilder.append("&" + URLEncoder.encode("endCreateDt","UTF-8") + "=" + URLEncoder.encode(today, "UTF-8")); /*end date */
-        URL url = new URL(urlBuilder.toString());// url 생성
-
-        //url 연결
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
-        conn.setRequestProperty("Content-type", "application/json");
-        //System.out.println("Response code: " + conn.getResponseCode());
-        BufferedReader rd;
-        if(conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300) {
-            rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        } else {
-            rd = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
-        }
-        StringBuilder sb = new StringBuilder();
-        String line;
-        while ((line = rd.readLine()) != null) {
-            sb.append(line);
-        }
-        rd.close();
-        conn.disconnect();
-
-
-
-        String xml = sb.toString();
-        //System.out.println("xml : " + xml);
-
-
-        //parsing 시작
         InputSource is = new InputSource(new StringReader(xml));
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder = factory.newDocumentBuilder();
@@ -285,17 +310,13 @@ public class COVID_API extends Activity {
                                                     default:
                                                         break;
                                                 }
-
-
                                             }
                                         }
                                     }
 
                                     //여기서부터 DB에 데이터 삽입
-                                    db.open();
                                     db.insertColumn(val[k].city, val[k].stdDay, val[k].overFlowCnt, val[k].localOccCnt, val[k].isolIngCnt, val[k].defCnt, val[k].deathCnt);
-                                    DebugDB.getAddressLog();
-                                    showDatabase("localOccCnt");
+                                    showDatabase("localOccCnt", db);
 //                                    val[k].printvalue();
 //                                    System.out.println();
 //                                    System.out.println();
@@ -309,7 +330,7 @@ public class COVID_API extends Activity {
         }
     }
 
-    public void showDatabase(String sort){
+    public void showDatabase(String sort, DBOpenHelper db){
         Cursor iCursor = db.sortColumn(sort);
         Log.d("showDatabase", "DB Size: " + iCursor.getCount());
         String res = "";
@@ -339,7 +360,7 @@ public class COVID_API extends Activity {
         if(text.length()<length){
             int gap = length - text.length();
             for (int i=0; i<gap; i++){
-                text = text + " ";
+                text += " ";
             }
         }
         return text;

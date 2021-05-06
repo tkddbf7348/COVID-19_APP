@@ -64,7 +64,7 @@ public class DBOpenHelper {
         return mDB.delete(DB.CreateDB.TABLENAME, "_id="+id, null) > 0;
     }
 
-    public class DatabaseHelper extends SQLiteOpenHelper {
+    private class DatabaseHelper extends SQLiteOpenHelper {
 
         //생성자
         public DatabaseHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
